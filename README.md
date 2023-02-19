@@ -12,11 +12,14 @@ Then sends a post request in json to your personal website or wherever you want 
 ## Install
 
 ### Step 1: clone this repo
-
+`git clone https://github.com/costa-rica/socialAggregator02.git`
 
 ### Step 2: create venv and pip install requirements
-`pip install -r requirements.txt`
-
+```
+python -m venv social_agg02
+source social_agg02/bin/activate
+pip install -r requirements.txt
+```
 
 ### Step 3: edit .ENV in this repo
 
@@ -81,7 +84,5 @@ To edit the time the cron scheduler fires each day go to main.py and see
 `job_collect_socials = scheduler.add_job(social_aggregator,'cron', day='*', hour='06', minute='01', second='05')`
 to edit the time.
 
-## On a personal note:
-**I'd love get feedback on this repo/markdown to make it more user friendly. If you need help or have suggestions I'd be happy help/edit/update :smile:**
-
-email: nrodrig1@gmail.com
+## :point_right: Feedback greatly appreciated :point_left:
+I'd love get feedback on this repo/markdown to make it more user friendly. If you need help or have suggestions I'd be happy help/edit/update. Email me at nrodrig1@gmail.com :smile:
