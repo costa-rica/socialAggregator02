@@ -1,4 +1,4 @@
-# ![alt text](/images/aggregate48_icon01.jpg) Social Aggregator 
+# ![alt text](/images/aggregate48_icon02.png) Social Aggregator 
 
 
 ## Description
