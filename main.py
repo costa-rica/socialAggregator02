@@ -47,8 +47,8 @@ def scheduler_funct():
     logger_init.info(f"- API dest for social activity to destination: {config.CONFIG_TYPE}-")
     scheduler = BackgroundScheduler()
 
-    job_collect_socials = scheduler.add_job(social_aggregator,'cron', hour='*', minute='52', second='29')#Testing
-    # job_collect_socials = scheduler.add_job(social_aggregator,'cron', day='*', hour='06', minute='01', second='05')#Production
+    # job_collect_socials = scheduler.add_job(social_aggregator,'cron', hour='*', minute='23', second='49')#Testing
+    job_collect_socials = scheduler.add_job(social_aggregator,'cron', day='*', hour='06', minute='01', second='05')#Production
 
     scheduler.start()
 
@@ -62,7 +62,10 @@ def social_aggregator():
     logger_init.info(f"- config.HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND: {config.HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND}-")
 
     github_scheduler_update()
-    twitter_scheduler_update()
+    try:
+        twitter_scheduler_update()
+    except:
+        logger_init.info(f"- Twitter unsuccessful")
     stackoverflow_scheduler_update()
     sending_to_dest()
     logger_init.info(f"* completed social aggregator *")
@@ -74,13 +77,20 @@ def social_aggregator():
 def sending_to_dest():
     logger_init.info(f"- Sending updated social activity to destination: {config.API_URL}-")
 
-    new_dict = get_social_activity_for_df()
+    # call iamnick.info/latest_post_date
+    headers = {'password':config.API_IAMNICK_PASSWORD,'Content-Type': 'application/json'}
+    response_latest_post_date = requests.get(config.API_URL + "/latest_post_date", headers=headers)
+    logger_init.info(f"- response_latest_post_date status code: {response_latest_post_date.status_code} -")
+    iamnick_latest_post_date = response_latest_post_date.json().get('date_of_last_post')
+    # iamnick_latest_post_date = None
+
+    new_dict = get_social_activity_for_df(iamnick_latest_post_date)
     # print(new_dict)
-    headers = {'password':config.API_ENDPOINT_TESTER_PASSWORD,'Content-Type': 'application/json'}
+    headers = {'password':config.API_IAMNICK_PASSWORD,'Content-Type': 'application/json'}
     payload = {'new_activity':new_dict}
+    # print(f"- password {config.API_IAMNICK_PASSWORD}")
 
-
-    response = requests.request("POST", config.API_URL, headers=headers, data=str(json.dumps(payload)))
+    response = requests.request("POST", config.API_URL + "/collect_new_activity", headers=headers, data=str(json.dumps(payload)))
 
     logger_init.info(f"- Sent updated social data to destination. Status code: {response.status_code} -")
 

@@ -86,3 +86,6 @@ to edit the time.
 
 ## :point_right: Feedback greatly appreciated :point_left:
 I'd love get feedback on this repo/markdown to make it more user friendly. If you need help or have suggestions I'd be happy help/edit/update. Email me at nrodrig1@gmail.com :smile:
+
+## Contribute
+Super happy to have someone help me add other social media. Medium (existing API) and goodreads (no API, but maybe screen scraper project) would be super useful for me :grin:!

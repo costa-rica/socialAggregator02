@@ -33,7 +33,7 @@ logger_data_service.addHandler(file_handler)
 logger_data_service.addHandler(stream_handler)
 
 
-def get_social_activity_for_df():
+def get_social_activity_for_df(latest_post_date):
     logger_data_service.info(f"- Inside get_social_activity_for_df  -")
     logger_data_service.info(f"- config.SQL_URI: {config.SQL_URI}  -")
 
@@ -48,7 +48,7 @@ def get_social_activity_for_df():
         logger_data_service.info(f"-***** USE_MIRROR_DF *****-")
         if os.path.exists(os.path.join(config.PROJ_DB_PATH,'df_mirror.pkl')):
             logger_data_service.info(f"- df_mirror Exists  -")
-            df_from_db = get_db_social_activity()
+            df_from_db = get_existing_social_activity()
             df_existing = pd.read_pickle(os.path.join(config.PROJ_DB_PATH,'df_mirror.pkl'))
             ### make unique index from network_post_id, social_name, title
             df_from_db.set_index(['network_post_id', 'social_name','title'], inplace=True)
@@ -65,7 +65,7 @@ def get_social_activity_for_df():
         
         else:# - All data is new
             logger_data_service.info(f"- df_mirror NOT exists  -")
-            df_to_add = get_db_social_activity()
+            df_to_add = get_existing_social_activity()
             df_to_add.to_pickle(os.path.join(config.PROJ_DB_PATH,'df_mirror.pkl'))
 
 
@@ -76,10 +76,11 @@ def get_social_activity_for_df():
 
         new_dict = df_to_add.to_dict('records')
 
-    else:# send HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND
-        logger_data_service.info(f"-***** HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND *****-")
+    elif latest_post_date==None:# send HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND
+        
         send_hist_days = config.HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND
-        df_from_db = get_db_social_activity()
+        logger_data_service.info(f"- HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND: {send_hist_days} -")
+        df_from_db = get_existing_social_activity()
 
         #make new column with post date in datetime format
         df_from_db['post_datetime']= pd.to_datetime(df_from_db['post_date'])
@@ -101,12 +102,40 @@ def get_social_activity_for_df():
 
         new_dict = df_from_db_subset.to_dict('records')
 
+    else:# send HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND
+        logger_data_service.info(f"- preparing all posts since {latest_post_date}-")
+        # send_hist_days = config.HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND
+        df_from_db = get_existing_social_activity()
+
+        df_from_db_subset = df_from_db[df_from_db.post_date > latest_post_date]
+
+        # #make new column with post date in datetime format
+        # df_from_db['post_datetime']= pd.to_datetime(df_from_db['post_date'])
+
+        print("lenght of df_form_db: ", len(df_from_db))
+
+        # today = datetime.now()
+        # start_date = today + timedelta(config.HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND * -1)
+
+        # df_from_db_subset = df_from_db[df_from_db["post_datetime"]> start_date]
+
+        # df_from_db_subset.drop(columns=["post_datetime"], inplace=True)
+
+
+        logger_data_service.info(f"- df_to_add.columns:   -")
+        logger_data_service.info(df_from_db_subset.columns)
+        logger_data_service.info(f"- df_to_add Length:   -")
+        logger_data_service.info(len(df_from_db_subset))
+
+        new_dict = df_from_db_subset.to_dict('records')
+        logger_data_service.info(f"- prepared all posts since {latest_post_date}-")
+
 
 
     return new_dict
 
 
-def get_db_social_activity():
+def get_existing_social_activity():
     # Check for duplicate tweets to remove
 
     base_query = sess.query(SocialPosts)
@@ -119,3 +148,5 @@ def get_db_social_activity():
             df_existing = df_existing.rename(columns=({col: col[len(table_name):]}))
 
     return df_existing
+
+

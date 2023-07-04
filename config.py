@@ -39,6 +39,7 @@ class ConfigBase:
         self.GITHUB_TOKEN = config_dict.get("GITHUB_TOKEN")
         self.SEND_DATA = os.environ.get('SEND_DATA')
         self.API_ENDPOINT_TESTER_PASSWORD = config_dict.get('API_ENDPOINT_TESTER_PASSWORD')
+        self.API_IAMNICK_PASSWORD = config_dict.get('API_IAMNICK_PASSWORD')
 
         self.HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND = config_dict.get('HISTORICAL_DAYS_OF_ACTIVITY_TO_SEND')
         self.USE_MIRROR_DF = config_dict.get('USE_MIRROR_DF')
@@ -49,7 +50,7 @@ class ConfigLocal(ConfigBase):
         super().__init__()
         
     DEBUG = True
-    API_URL = config_dict.get('UPDATE_DESTINATION_URL_LOCAL')
+    API_URL = config_dict.get('UPDATE_SOCIAL_POSTS_API_URL_LOCAL')
     API_ENDPOINT_TESTER_URL = config_dict.get('API_ENDPOINT_TESTER_URL')
     
             
@@ -70,7 +71,7 @@ class ConfigProd(ConfigBase):
         super().__init__()
 
     DEBUG = False
-    API_URL = config_dict.get('UPDATE_DESTINATION_URL')
+    API_URL = config_dict.get('UPDATE_SOCIAL_POSTS_API_URL_PRODUCTION')
     API_ENDPOINT_TESTER_URL = config_dict.get('API_ENDPOINT_TESTER_URL')
 
 
